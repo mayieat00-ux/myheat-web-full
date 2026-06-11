@@ -1,0 +1,31 @@
+{
+  "name": "mayieat-web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "MayiEat - Healthy food scanner with personalized nutrition ratings",
+  "workspaces": [
+    "shared",
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "build:shared": "npm -w @mayieat/shared run build",
+    "build:backend": "npm -w @mayieat/backend run build",
+    "build:frontend": "npm -w @mayieat/frontend run build",
+    "build": "npm run build:shared && npm run build:backend && npm run build:frontend",
+    "dev:backend": "npm -w @mayieat/backend run dev",
+    "dev:frontend": "npm -w @mayieat/frontend run dev",
+    "dev": "concurrently -n be,fe -c blue,green \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "db:migrate": "npm -w @mayieat/backend run prisma:migrate",
+    "db:studio": "npm -w @mayieat/backend run prisma:studio",
+    "lint": "npm -w @mayieat/backend run lint && npm -w @mayieat/frontend run lint"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.3"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

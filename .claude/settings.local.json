@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(npm install --no-audit --no-fund 2>&1)",
+      "PowerShell(npm run build:shared 2>&1)",
+      "PowerShell(npm run dev:backend)",
+      "Bash(until grep *)",
+      "Read(//c/Users/abc/AppData/Local/Temp/claude/d--Projects-Parichay-mayieat-web/ad49f076-9f10-4a5e-8348-06424402b142/tasks/**)",
+      "PowerShell(npm run dev:frontend)",
+      "PowerShell($home_page = Invoke-WebRequest -Uri \"http://localhost:3001\" -UseBasicParsing; \"HTTP {0}\" -f $home_page.StatusCode; \"\"; \"=== Title present? ===\"; if \\($home_page.Content -match \"Scan any food\"\\) { \"YES - homepage rendered\" } else { \"NO - unexpected content\" }; \"\"; \"=== Backend healthy? ===\"; $h = Invoke-RestMethod -Uri \"http://localhost:4000/api/v1/health\"; $h | ConvertTo-Json -Compress; \"\"; \"=== CORS from frontend origin? ===\"; try { $cors = Invoke-WebRequest -Uri \"http://localhost:4000/api/v1/health\" -Headers @{ \"Origin\" = \"http://localhost:3001\" } -UseBasicParsing; \"Access-Control-Allow-Origin: \" + $cors.Headers[\"Access-Control-Allow-Origin\"] } catch { \"CORS failed: \" + $_.Exception.Message })"
+    ]
+  }
+}
