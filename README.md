@@ -4,19 +4,18 @@ Healthy food scanner web app. Scan a food (barcode or photo) and get a personali
 
 ## Stack
 
-- **Frontend**: Next.js (App Router) + TypeScript + Tailwind CSS
-- **Backend**: Node.js + Express + TypeScript
+- **App**: Next.js (App Router) + TypeScript + Tailwind CSS
 - **Database**: PostgreSQL + Prisma ORM
 - **APIs**: OpenFoodFacts (barcodes) + Google Gemini (vision + diet plans)
 - **Auth**: Google OAuth via Auth.js
+- **API routes**: Embedded in Next.js (no separate backend server)
 
 ## Monorepo layout
 
 ```text
 mayieat-web/
 ├── shared/      # Shared types, enums, constants
-├── backend/     # Express API server
-└── frontend/    # Next.js web app
+└── frontend/    # Next.js web app + embedded API routes
 ```
 
 ## Getting started
@@ -25,19 +24,18 @@ mayieat-web/
 # 1. Install all workspaces
 npm install
 
-# 2. Copy env templates and fill in values
-cp .env.example backend/.env
+# 2. Copy env template and fill in values
 cp .env.example frontend/.env.local
 
 # 3. Initialize the database (PostgreSQL must be running)
 npm run db:migrate
 
-# 4. Start both apps in dev mode
+# 4. Start the dev server
 npm run dev
 ```
 
-- Backend: <http://localhost:4000>
-- Frontend: <http://localhost:3001>
+- App: <http://localhost:3001>
+- API: <http://localhost:3001/api/v1>
 
 ## Subscription model
 

@@ -42,3 +42,6 @@ coverage/
 # Misc
 .turbo/
 .cache/
+
+.claude
+GOOGLE_LOGIN_SETUP.md

@@ -34,23 +34,22 @@ these steps once — it takes ~5 minutes.
 
 7. Click **Create**. Copy the **Client ID** and **Client secret**.
 
-## 2. Put the credentials in your `.env` files
+## 2. Put the credentials in your `.env.local`
 
-**`frontend/.env.local`** — used by Auth.js for the browser login flow:
+All OAuth configuration lives in **`frontend/.env.local`**:
 
 ```env
 NEXT_PUBLIC_API_URL="/api/v1"
 # Generate a strong value:  openssl rand -base64 32
-NEXTAUTH_SECRET="<a-strong-random-32+-char-string>"
+AUTH_SECRET="<a-strong-random-32+-char-string>"
 GOOGLE_CLIENT_ID="<your-client-id>.apps.googleusercontent.com"
 GOOGLE_CLIENT_SECRET="<your-client-secret>"
-```
 
-**`backend/.env`** — the backend verifies the Google token, so it needs the
-**same Client ID** (the secret is not required here):
+# PostgreSQL connection string
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/mayieat?schema=public"
 
-```env
-GOOGLE_CLIENT_ID="<your-client-id>.apps.googleusercontent.com"
+# JWT used by the embedded API to sign session tokens
+JWT_SECRET="<another-strong-random-string>"
 ```
 
 ## 3. Restart the dev servers
@@ -65,8 +64,9 @@ Open <http://localhost:3001/login> and click **Continue with Google**.
 
 1. Auth.js redirects to Google, the user consents, Google returns an
    **ID token** to the frontend.
-2. The frontend posts that ID token to the backend `POST /api/v1/auth/google`.
-3. The backend verifies it against `GOOGLE_CLIENT_ID`, upserts the user, and
+2. The frontend posts that ID token to the embedded API route
+   `POST /api/v1/auth/google`.
+3. The API verifies it against `GOOGLE_CLIENT_ID`, upserts the user, and
    returns its own JWT, which the session carries as `backendJwt`.
 
 ## Troubleshooting
@@ -75,9 +75,9 @@ Open <http://localhost:3001/login> and click **Continue with Google**.
   the URL bar exactly, including `http`, host, and port `3001`.
 - **`Access blocked` / `403`** — add your Google account under **Test users**
   on the consent screen.
-- **Bounced back to `/login` with an error banner** — the backend rejected the
-  token. Confirm `GOOGLE_CLIENT_ID` is identical in `frontend/.env.local` and
-  `backend/.env`, and that the backend is running on port 4000.
+- **Bounced back to `/login` with an error banner** — the API rejected the token.
+  Confirm `GOOGLE_CLIENT_ID` is set in `frontend/.env.local` and that the
+  Next.js dev server is running on port 3001.
 - **`UntrustedHost`** — already handled (`trustHost: true` in `auth.ts`), but if
   you still see it in production, set `NEXTAUTH_URL` to your canonical URL.
 - **No credentials yet?** In development you can still use the
