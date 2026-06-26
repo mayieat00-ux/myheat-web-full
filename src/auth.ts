@@ -1,4 +1,5 @@
 import NextAuth, { type DefaultSession } from 'next-auth';
+import Credentials from 'next-auth/providers/credentials';
 import Google from 'next-auth/providers/google';
 
 import { env, PUBLIC_API_URL } from '@/lib/server/env';
@@ -47,6 +48,19 @@ async function exchangeGoogleTokenForBackendJwt(idToken: string): Promise<Backen
   return res.json() as Promise<BackendAuthResponse>;
 }
 
+/** Dev-only: hit the backend's /auth/dev-login bypass. */
+async function fetchDevLoginJwt(): Promise<BackendAuthResponse> {
+  const res = await fetch(`${PUBLIC_API_URL}/auth/dev-login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Dev login failed (${res.status}): ${body}`);
+  }
+  return res.json() as Promise<BackendAuthResponse>;
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   // Auth.js v5 needs an explicit secret.
   secret: env.AUTH_SECRET,
@@ -58,6 +72,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     Google({
       clientId: env.GOOGLE_CLIENT_ID,
       clientSecret: env.GOOGLE_CLIENT_SECRET,
+    }),
+    // Dev/test bypass. authorize() returns a placeholder user; the actual
+    // backend JWT exchange happens in the jwt callback below.
+    Credentials({
+      id: 'dev-login',
+      name: 'Dev Login',
+      credentials: {},
+      async authorize() {
+        return { id: 'pending', email: 'devuser@mayieat.local' };
+      },
     }),
   ],
   session: { strategy: 'jwt' },
@@ -84,6 +108,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           // page (/login?error=...) instead of silently creating a half-baked
           // session that bounces the user straight back to /login.
           throw new Error('GoogleExchangeFailed');
+        }
+      }
+
+      // ---- Initial sign-in via dev bypass ----
+      if (account?.provider === 'dev-login') {
+        try {
+          const data = await fetchDevLoginJwt();
+          t.backendJwt = data.jwt;
+          t.profileComplete = data.user.profileComplete;
+          t.plan = data.user.subscription.plan;
+          t.sub = data.user.id;
+          t.email = data.user.email;
+        } catch (err) {
+          // eslint-disable-next-line no-console
+          console.error('[auth] dev login exchange failed', err);
         }
       }
 

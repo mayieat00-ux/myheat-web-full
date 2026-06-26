@@ -97,6 +97,27 @@ export default async function LoginPage({
             </button>
           </form>
 
+          <div className="my-5 flex items-center gap-3 text-xs text-gray-400">
+            <div className="h-px flex-1 bg-gray-200" />
+            <span>bypass</span>
+            <div className="h-px flex-1 bg-gray-200" />
+          </div>
+          <form
+            action={async () => {
+              'use server';
+              await signIn('dev-login', { redirectTo: callbackUrl });
+            }}
+          >
+            <button
+              type="submit"
+              className="w-full rounded-xl border-2 border-dashed border-amber-300 bg-amber-50 px-6 py-3 text-base font-medium text-amber-800 transition active:scale-[0.99] hover:bg-amber-100"
+            >
+              Continue as Dev User
+            </button>
+            <p className="mt-1.5 text-center text-xs text-amber-700">
+              Bypasses Google. Remove before real production.
+            </p>
+          </form>
         </div>
 
         <p className="mx-auto mt-6 max-w-xs text-center text-xs text-gray-400">
