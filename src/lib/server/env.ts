@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
-const envSchema = z.object({
+const baseEnvSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
-  AUTH_URL: z.string().url().default('http://localhost:3001'),
+  AUTH_URL: z.string().url('AUTH_URL must be a valid URL'),
   AUTH_SECRET: z.string().min(16, 'AUTH_SECRET must be at least 16 chars'),
   DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
   JWT_SECRET: z.string().min(16, 'JWT_SECRET must be at least 16 chars'),
@@ -11,6 +11,14 @@ const envSchema = z.object({
   GEMINI_API_KEY: z.string().optional().default(''),
   GEMINI_MODEL: z.string().default('gemini-2.5-flash'),
 });
+
+// In production Google OAuth is the only login path, so the credentials are required.
+const productionEnvSchema = baseEnvSchema.extend({
+  GOOGLE_CLIENT_ID: z.string().min(1, 'GOOGLE_CLIENT_ID is required in production'),
+  GOOGLE_CLIENT_SECRET: z.string().min(1, 'GOOGLE_CLIENT_SECRET is required in production'),
+});
+
+const envSchema = process.env.NODE_ENV === 'production' ? productionEnvSchema : baseEnvSchema;
 
 const parsed = envSchema.safeParse(process.env);
 

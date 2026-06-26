@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { auth, signIn } from '@/auth';
-import { env } from '@/lib/server/env';
 
 const ERROR_MESSAGES: Record<string, string> = {
   GoogleExchangeFailed:
@@ -22,8 +21,6 @@ export default async function LoginPage({
   const session = await auth();
   const params = await searchParams;
   const callbackUrl = params.callbackUrl ?? '/scan';
-  const isDev = env.NODE_ENV === 'development';
-  const googleConfigured = Boolean(env.GOOGLE_CLIENT_ID);
 
   if (session?.backendJwt) {
     redirect(session.profileComplete ? callbackUrl : '/onboarding');
@@ -100,40 +97,6 @@ export default async function LoginPage({
             </button>
           </form>
 
-          {!googleConfigured && isDev && (
-            <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">
-              Google credentials aren&apos;t set yet — add{' '}
-              <code className="font-mono">GOOGLE_CLIENT_ID</code> /{' '}
-              <code className="font-mono">GOOGLE_CLIENT_SECRET</code> to{' '}
-              <code className="font-mono">.env</code>, or use the dev login below.
-            </p>
-          )}
-
-          {isDev && (
-            <>
-              <div className="my-5 flex items-center gap-3 text-xs text-gray-400">
-                <div className="h-px flex-1 bg-gray-200" />
-                <span>dev only</span>
-                <div className="h-px flex-1 bg-gray-200" />
-              </div>
-              <form
-                action={async () => {
-                  'use server';
-                  await signIn('dev-login', { redirectTo: callbackUrl });
-                }}
-              >
-                <button
-                  type="submit"
-                  className="w-full rounded-xl border-2 border-dashed border-amber-300 bg-amber-50 px-6 py-3 text-base font-medium text-amber-800 transition active:scale-[0.99] hover:bg-amber-100"
-                >
-                  Continue as Dev User
-                </button>
-                <p className="mt-1.5 text-center text-xs text-amber-700">
-                  Bypasses Google. Disabled in production.
-                </p>
-              </form>
-            </>
-          )}
         </div>
 
         <p className="mx-auto mt-6 max-w-xs text-center text-xs text-gray-400">
