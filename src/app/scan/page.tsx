@@ -70,7 +70,7 @@ export default async function ScanDashboardPage() {
 
   return (
     <div className="min-h-[100svh] bg-gray-50 pb-28 sm:pb-12">
-      <DashboardHeader name={session.user?.name} email={session.user?.email} image={session.user?.image} />
+    <DashboardHeader name={session.user?.name} email={session.user?.email} image={session.user?.image} />
 
       <main className="mx-auto max-w-xl space-y-4 px-4 pb-4">
         <ScanCtaCard />

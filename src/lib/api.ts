@@ -4,7 +4,10 @@
 //
 // Throws ApiError on non-2xx responses. Always parses JSON when present.
 
-import { PUBLIC_API_URL } from './env';
+const isServer = typeof window === 'undefined';
+const SERVER_API_URL = `${process.env.AUTH_URL ?? 'http://localhost:3001'}/api/v1`;
+const CLIENT_API_URL = '/api/v1';
+const PUBLIC_API_URL = isServer ? SERVER_API_URL : CLIENT_API_URL;
 
 export class ApiError extends Error {
   constructor(

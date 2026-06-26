@@ -2,6 +2,8 @@ import { z } from 'zod';
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+  AUTH_URL: z.string().url().default('http://localhost:3001'),
+  AUTH_SECRET: z.string().min(16, 'AUTH_SECRET must be at least 16 chars'),
   DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
   JWT_SECRET: z.string().min(16, 'JWT_SECRET must be at least 16 chars'),
   GOOGLE_CLIENT_ID: z.string().optional().default(''),
@@ -21,3 +23,5 @@ if (!parsed.success) {
 }
 
 export const env = parsed.data;
+
+export const PUBLIC_API_URL = `${env.AUTH_URL}/api/v1`;

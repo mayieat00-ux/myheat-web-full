@@ -24,8 +24,8 @@ mayieat-web/
 # 1. Install all workspaces
 npm install
 
-# 2. Copy env template and fill in values
-cp .env.example frontend/.env.local
+# 2. Fill in the root .env file with your credentials
+# See the inline comments in .env
 
 # 3. Initialize the database (PostgreSQL must be running)
 npm run db:migrate

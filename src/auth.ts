@@ -2,10 +2,11 @@ import NextAuth, { type DefaultSession } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import Google from 'next-auth/providers/google';
 
-import { PUBLIC_API_URL } from '@/lib/env';
+import { env, PUBLIC_API_URL } from '@/lib/server/env';
 
 // Augment NextAuth types so `session.backendJwt` is strongly typed everywhere.
 // The JWT is issued by the embedded Next.js API routes, not a separate backend.
+
 declare module 'next-auth' {
   interface Session {
     backendJwt?: string;
@@ -61,17 +62,16 @@ async function fetchDevLoginJwt(): Promise<BackendAuthResponse> {
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  // Auth.js v5 needs an explicit secret. Support both the v5 name (AUTH_SECRET)
-  // and the legacy NEXTAUTH_SECRET so existing .env files keep working.
-  secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
-  // Required when the app is reached over something other than the canonical
-  // host — e.g. a phone hitting http://<PC-LAN-IP>:3001. Without this, Auth.js
-  // throws `UntrustedHost` and Google sign-in fails on the device.
-  trustHost: true,
+  // Auth.js v5 needs an explicit secret.
+  secret: env.AUTH_SECRET,
+  // Trust the Host header only in development (e.g. phone on LAN). In
+  // production we rely on the canonical AUTH_URL so the Google redirect URI
+  // is always exactly the one registered in Google Cloud Console.
+  trustHost: env.NODE_ENV === 'development',
   providers: [
     Google({
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      clientId: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
     }),
     // Dev-only bypass. authorize() just returns a placeholder user to satisfy
     // Auth.js — the *actual* backend JWT exchange happens in the jwt callback,
@@ -82,7 +82,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       name: 'Dev Login',
       credentials: {},
       async authorize() {
-        if (process.env.NODE_ENV !== 'development') return null;
+        if (env.NODE_ENV !== 'development') return null;
         return { id: 'pending', email: 'devuser@mayieat.local' };
       },
     }),

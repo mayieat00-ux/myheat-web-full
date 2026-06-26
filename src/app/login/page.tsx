@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { auth, signIn } from '@/auth';
+import { env } from '@/lib/server/env';
 
 const ERROR_MESSAGES: Record<string, string> = {
   GoogleExchangeFailed:
@@ -21,8 +22,8 @@ export default async function LoginPage({
   const session = await auth();
   const params = await searchParams;
   const callbackUrl = params.callbackUrl ?? '/scan';
-  const isDev = process.env.NODE_ENV === 'development';
-  const googleConfigured = Boolean(process.env.GOOGLE_CLIENT_ID);
+  const isDev = env.NODE_ENV === 'development';
+  const googleConfigured = Boolean(env.GOOGLE_CLIENT_ID);
 
   if (session?.backendJwt) {
     redirect(session.profileComplete ? callbackUrl : '/onboarding');
@@ -104,7 +105,7 @@ export default async function LoginPage({
               Google credentials aren&apos;t set yet — add{' '}
               <code className="font-mono">GOOGLE_CLIENT_ID</code> /{' '}
               <code className="font-mono">GOOGLE_CLIENT_SECRET</code> to{' '}
-              <code className="font-mono">.env.local</code>, or use the dev login below.
+              <code className="font-mono">.env</code>, or use the dev login below.
             </p>
           )}
 
