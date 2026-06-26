@@ -32,4 +32,4 @@ if (!parsed.success) {
 
 export const env = parsed.data;
 
-export const PUBLIC_API_URL = `${env.AUTH_URL}/api/v1`;
+export const PUBLIC_API_URL = `${env.AUTH_URL.replace(/\/$/, '')}/api/v1`;
